@@ -13,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class TenantQueueRegistry {
     private final Tier tier;
+    private final Map<TenantQueueKey, TenantQueue> tenantQueueKeys = new ConcurrentHashMap<>();
     private final Map<String, TenantQueue> tenantQueues = new ConcurrentHashMap<>();
 
     public TenantQueueRegistry(Tier tier) {
@@ -23,8 +24,9 @@ public final class TenantQueueRegistry {
         return tier;
     }
 
-    public void addTenant(String tenantId, int capacity) {
-        tenantQueues.put(tenantId, new TenantQueue(capacity));
+    public void addTenant(TenantQueueKey tenantQueueKey, int capacity) {
+        tenantQueueKeys.put(tenantQueueKey, new TenantQueue(capacity));
+        tenantQueues.put(tenantQueueKey.getTenantId(), new TenantQueue(capacity));
     }
 
     public TenantQueue queueFor(String tenantId) {
@@ -41,10 +43,10 @@ public final class TenantQueueRegistry {
     }
 
     /** Candidates the ScoringEngine is allowed to pick from on this tick. */
-    public List<String> nonEmptyTenants() {
-        List<String> result = new ArrayList<>();
-        for (Map.Entry<String, TenantQueue> entry : tenantQueues.entrySet()) {
-            if (!entry.getValue().isEmpty()) {
+    public List<TenantQueueKey> nonEmptyTenants() {
+        List<TenantQueueKey> result = new ArrayList<>();
+        for (Map.Entry<TenantQueueKey, TenantQueue> entry : tenantQueueKeys.entrySet()) {
+            if (!tenantQueues.get(entry.getKey().getTenantId()).isEmpty()) {
                 result.add(entry.getKey());
             }
         }

@@ -1,6 +1,8 @@
 package com.example.scheduler.registry;
 
 import com.example.scheduler.domain.Tier;
+import com.example.scheduler.queue.TenantQueueKey;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,8 +15,8 @@ import java.util.Map;
 public final class TenantRegistry {
     private final Map<String, Tier> tenantToTier = new HashMap<>();
 
-    public void register(String tenantId, Tier tier) {
-        tenantToTier.put(tenantId, tier);
+    public void register(TenantQueueKey tenantQueueKey, Tier tier) {
+        tenantToTier.put(tenantQueueKey.getTenantId(), tier);
     }
 
     public Tier tierOf(String tenantId) {

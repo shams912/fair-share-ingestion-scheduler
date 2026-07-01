@@ -14,18 +14,22 @@ public final class TenantStats {
     private volatile long lastProcessedAt = 0L; // 0 => never processed => scores highest under LRU
     private volatile long totalWaitTimeMs = 0L;
     private volatile long totalExecTimeMs = 0L;
+    private volatile long currentTimeMs = 0L;
     private volatile int messagesProcessedCount = 0;
+    private volatile int queueDepth = 0;
     private final int allocatedCapacity;
 
     public TenantStats(int allocatedCapacity) {
         this.allocatedCapacity = allocatedCapacity;
     }
 
-    public void recordProcessing(long dispatchTime, long waitTimeMs, long execTimeMs) {
+    public void recordProcessing(long dispatchTime, long waitTimeMs, long execTimeMs, int queueDepth) {
         this.lastProcessedAt = dispatchTime;
         this.totalWaitTimeMs += waitTimeMs;
         this.totalExecTimeMs += execTimeMs;
+        this.currentTimeMs = System.currentTimeMillis();
         this.messagesProcessedCount++;
+        this.queueDepth = queueDepth;
     }
 
     public long lastProcessedAt() {
@@ -40,6 +44,14 @@ public final class TenantStats {
         return messagesProcessedCount;
     }
 
+    public int getQueueDepth() {
+        return queueDepth;
+    }
+
+    public long getCurrentTimeMs() {
+        return currentTimeMs;
+    }
+
     public double avgExecTimePerMessage() {
         return messagesProcessedCount == 0 ? 0.0 : (double) totalExecTimeMs / messagesProcessedCount;
     }
@@ -47,4 +59,5 @@ public final class TenantStats {
     public double avgWaitTimeMs() {
         return messagesProcessedCount == 0 ? 0.0 : (double) totalWaitTimeMs / messagesProcessedCount;
     }
+
 }

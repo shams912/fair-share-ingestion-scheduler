@@ -15,16 +15,16 @@ import java.util.Map;
  */
 public final class TenantRouter {
     private final TenantRegistry tenantRegistry;
-    private final Map<Tier, TenantQueueRegistry> queueSpaces;
+    private final Map<Tier, TenantQueueRegistry> tenantQueueRegistryMap;
 
-    public TenantRouter(TenantRegistry tenantRegistry, Map<Tier, TenantQueueRegistry> queueSpaces) {
+    public TenantRouter(TenantRegistry tenantRegistry, Map<Tier, TenantQueueRegistry> tenantQueueRegistryMap) {
         this.tenantRegistry = tenantRegistry;
-        this.queueSpaces = queueSpaces;
+        this.tenantQueueRegistryMap = tenantQueueRegistryMap;
     }
 
     public void route(Message message) {
-        Tier tier = tenantRegistry.tierOf(message.tenantId());
-        TenantQueue tenantQueue = queueSpaces.get(tier).queueFor(message.tenantId());
+        Tier tier = tenantRegistry.tierOf(message.tenantQueueKey().getTenantId());
+        TenantQueue tenantQueue = tenantQueueRegistryMap.get(tier).queueFor(message.tenantQueueKey().getTenantId());
         tenantQueue.enqueue(message);
     }
 }

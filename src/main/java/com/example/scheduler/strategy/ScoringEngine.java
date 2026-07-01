@@ -1,5 +1,6 @@
 package com.example.scheduler.strategy;
 
+import com.example.scheduler.queue.TenantQueueKey;
 import com.example.scheduler.queue.TenantQueueRegistry;
 import com.example.scheduler.registry.TenantStats;
 import com.example.scheduler.registry.TenantStatsRegistry;
@@ -7,6 +8,8 @@ import com.example.scheduler.registry.TenantStatsSnapshot;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Wraps a single ScoringStrategy (dependency-injected via constructor, so it's
@@ -25,12 +28,17 @@ public final class ScoringEngine {
      * @param nonEmptyTenants tenants in this tier currently holding at least one message
      * @return the tenantId to dispatch next, or null if the candidate list was empty
      */
-    public String selectNext(List<String> nonEmptyTenants, TenantStatsRegistry statsRegistry,
+    public TenantQueueKey selectNext(List<TenantQueueKey> nonEmptyTenants, TenantStatsRegistry statsRegistry,
                              TenantQueueRegistry tenantQueueRegistry, long now) {
         // Sort first so iteration is lexical; combined with the strict "> bestScore"
         // check below, a tie keeps whichever tenantId sorts first alphabetically -
         // a deterministic tie-break with no round-robin bias, as the architecture requires.
-        List<String> sortedCandidates = new ArrayList<>(nonEmptyTenants);
+        List<String> sortedCandidates = new ArrayList<>(nonEmptyTenants.size());
+        Map<String, TenantQueueKey> tenantQueueKeyMap = new ConcurrentHashMap<>();
+        nonEmptyTenants.forEach(tenantQueueKey -> {
+                    sortedCandidates.add(tenantQueueKey.getTenantId());
+                    tenantQueueKeyMap.put(tenantQueueKey.getTenantId(), tenantQueueKey);
+        } );
         Collections.sort(sortedCandidates);
 
         String best = null;
@@ -45,6 +53,6 @@ public final class ScoringEngine {
                 best = tenantId;
             }
         }
-        return best;
+        return tenantQueueKeyMap.get(best);
     }
 }

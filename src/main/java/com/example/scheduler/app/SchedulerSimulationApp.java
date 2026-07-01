@@ -4,6 +4,7 @@ import com.example.scheduler.config.TenantConfig;
 import com.example.scheduler.domain.Message;
 import com.example.scheduler.domain.Tier;
 import com.example.scheduler.dispatcher.WorkerDispatcher;
+import com.example.scheduler.metrics.MetricsChartGenerator;
 import com.example.scheduler.queue.TenantQueueKey;
 import com.example.scheduler.queue.TenantQueueRegistry;
 import com.example.scheduler.registry.TenantRegistry;
@@ -29,12 +30,12 @@ import java.util.concurrent.TimeUnit;
 public final class SchedulerSimulationApp {
 
     private static final TenantConfig[] TENANT_CONFIGS = {
-            new TenantConfig("G1", Tier.GOLD, 2, 500),
-            new TenantConfig("G2", Tier.GOLD, 1, 30),
-            new TenantConfig("S1", Tier.SILVER, 2, 14),
+            new TenantConfig("G1", Tier.GOLD, 1, 500),
+            new TenantConfig("G2", Tier.GOLD, 1, 300),
+            new TenantConfig("S1", Tier.SILVER, 1, 14),
             new TenantConfig("S2", Tier.SILVER, 1, 60),
-            new TenantConfig("S3", Tier.SILVER, 3, 20),
-            new TenantConfig("B1", Tier.BRONZE, 2, 8),
+            new TenantConfig("S3", Tier.SILVER, 1, 20),
+            new TenantConfig("B1", Tier.BRONZE, 1, 8),
             new TenantConfig("B2", Tier.BRONZE, 1, 2),
     };
     private static final int PER_TENANT_QUEUE_CAPACITY = 50;
@@ -84,7 +85,7 @@ public final class SchedulerSimulationApp {
         pool.awaitTermination(5, TimeUnit.MINUTES);
     }
 
-    private static void printSummary(TenantStatsRegistry statsRegistry) {
+    private static void printSummary(TenantStatsRegistry statsRegistry) throws IOException {
         System.out.println("\n=== Summary ===");
         for (TenantConfig config : TENANT_CONFIGS) {
             TenantStats stats = statsRegistry.get(config.tenantId());
@@ -93,5 +94,8 @@ public final class SchedulerSimulationApp {
                     stats.avgWaitTimeMs(), stats.avgExecTimePerMessage(),
                     stats.lastProcessedAt());
         }
+        MetricsChartGenerator.generateCharts("metrics-GOLD.csv", Tier.GOLD.name());
+        MetricsChartGenerator.generateCharts("metrics-SILVER.csv", Tier.SILVER.name());
+        MetricsChartGenerator.generateCharts("metrics-BRONZE.csv", Tier.BRONZE.name());
     }
 }

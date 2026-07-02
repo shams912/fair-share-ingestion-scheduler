@@ -30,13 +30,18 @@ import java.util.concurrent.TimeUnit;
 public final class SchedulerSimulationApp {
 
     private static final TenantConfig[] TENANT_CONFIGS = {
-            new TenantConfig("G1", Tier.GOLD, 1, 500),
-            new TenantConfig("G2", Tier.GOLD, 1, 300),
+            new TenantConfig("G1", Tier.GOLD, 1, 1000),
+            new TenantConfig("G2", Tier.GOLD, 1, 600),
+            new TenantConfig("G3", Tier.GOLD, 1, 300),
+            new TenantConfig("G4", Tier.GOLD, 1, 50),
             new TenantConfig("S1", Tier.SILVER, 1, 14),
-            new TenantConfig("S2", Tier.SILVER, 1, 60),
+            new TenantConfig("S2", Tier.SILVER, 1, 80),
             new TenantConfig("S3", Tier.SILVER, 1, 20),
-            new TenantConfig("B1", Tier.BRONZE, 1, 8),
-            new TenantConfig("B2", Tier.BRONZE, 1, 2),
+            new TenantConfig("B1", Tier.BRONZE, 1, 40),
+            new TenantConfig("B2", Tier.BRONZE, 1, 20),
+            new TenantConfig("B3", Tier.BRONZE, 1, 2),
+            new TenantConfig("B4", Tier.BRONZE, 1, 8),
+            new TenantConfig("B5", Tier.BRONZE, 1, 90),
     };
     private static final int PER_TENANT_QUEUE_CAPACITY = 50;
 

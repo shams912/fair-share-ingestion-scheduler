@@ -53,7 +53,7 @@ public final class MetricsChartGenerator {
         XYChart chart = new XYChartBuilder()
                 .width(1200)
                 .height(700)
-                .title(group + "Queue Depth vs Timestamp")
+                .title(group + " Queue Depth vs Timestamp")
                 .xAxisTitle("Timestamp")
                 .yAxisTitle("Queue Depth")
                 .build();
